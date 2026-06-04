@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Agente IA | Avenger Sport Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#1e293b;background:#ffffff;overflow-x:hidden;line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center}
+img{max-width:100%;display:block}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+:root{
+  --navy:#1b365d;--navy-dark:#0f2340;--navy-light:#2a4a7a;
+  --magenta:#e6007e;--magenta-dark:#c4006b;
+  --cyan:#00a1cb;--cyan-light:#00c4f0;
+  --gradient:linear-gradient(135deg,#e6007e 0%,#00a1cb 100%);
+  --gradient-soft:linear-gradient(135deg,rgba(230,0,126,.08) 0%,rgba(0,161,203,.08) 100%);
+  --white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.1);--shadow-lg:0 8px 30px rgba(0,0,0,.12);--shadow-xl:0 20px 60px rgba(0,0,0,.15);
+  --radius:12px;--radius-lg:20px;--radius-xl:28px;
+}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes typing{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+.delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.4,0,.2,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-scale{opacity:0;transform:scale(.9);transition:all .6s cubic-bezier(.4,0,.2,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+
+.section{padding:80px 24px;position:relative;overflow:hidden;width:100%;background:var(--white)}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-title{font-size:clamp(28px,5vw,42px);font-weight:800;line-height:1.15;color:var(--navy)}
+.section-subtitle{font-size:clamp(15px,2.5vw,18px);color:var(--gray-500);margin-top:12px;max-width:680px;line-height:1.7}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;background:var(--gradient-soft);border:1px solid rgba(230,0,126,.15);border-radius:50px;font-size:12px;font-weight:600;color:var(--magenta);letter-spacing:.3px;text-transform:uppercase}
+@media(max-width:768px){.section{padding:60px 16px}}
+
+.sim-container{max-width:900px;margin:0 auto}
+.sim-scenarios{display:flex;flex-wrap:wrap;gap:8px;margin:32px 0 24px;justify-content:center}
+.sim-scenario-btn{padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;border:2px solid var(--gray-200);color:var(--gray-600);transition:all .3s;background:var(--white)}
+.sim-scenario-btn:hover{border-color:var(--magenta);color:var(--magenta)}
+.sim-scenario-btn.active{background:var(--gradient);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(230,0,126,.3)}
+.sim-chat{background:var(--gray-50);border-radius:var(--radius-lg);border:1px solid var(--gray-200);overflow:hidden;box-shadow:var(--shadow-md)}
+.sim-chat-header{background:var(--gradient);padding:16px 20px;display:flex;align-items:center;gap:12px}
+.sim-chat-header .sim-av{width:44px;height:44px;border-radius:50%;background:#0f0f0f;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;border:2px solid rgba(255,255,255,.4);letter-spacing:-1px}
+.sim-chat-header .sim-info h5{font-size:15px;font-weight:700;color:#fff}
+.sim-chat-header .sim-info span{font-size:12px;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:4px}
+.sim-chat-header .sim-info span .online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.sim-chat-body{padding:20px;min-height:380px;max-height:540px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:var(--gray-50)}
+.sim-bubble{max-width:80%;padding:14px 18px;border-radius:16px;font-size:14px;line-height:1.6;animation:fadeInUp .4s ease both}
+.sim-bubble.bot{background:var(--white);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);color:var(--gray-800)}
+.sim-bubble.user{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.sim-bubble .sim-time{font-size:10px;color:var(--gray-500);margin-top:6px;display:block}
+.sim-bubble.user .sim-time{color:rgba(255,255,255,.6)}
+.sim-typing{align-self:flex-start;display:flex;gap:4px;padding:12px 16px}
+.sim-typing span{width:8px;height:8px;background:var(--gray-400);border-radius:50%;animation:typing 1.2s ease-in-out infinite}
+.sim-typing span:nth-child(2){animation-delay:.2s}
+.sim-typing span:nth-child(3){animation-delay:.4s}
+
+.sim-chat-footer{padding:14px 20px;border-top:1px solid var(--gray-200);display:flex;align-items:center;gap:10px;background:var(--white)}
+.sim-chat-footer .sim-input{flex:1;padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:24px;font-size:13px;color:var(--gray-500)}
+.sim-chat-footer .sim-send{width:42px;height:42px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;box-shadow:0 4px 12px rgba(230,0,126,.3)}
+.sim-chat-footer .sim-send:hover{transform:scale(1.08)}
+
+.foot-note{text-align:center;margin-top:40px;font-size:12px;color:var(--gray-400);letter-spacing:.3px}
+.foot-note strong{color:var(--magenta);font-weight:700}
+</style>
+</head>
+<body>
+
+<section class="section" id="simulator"><div class="section-inner">
+  <div style="text-align:center">
+    <div class="badge reveal visible">Demo personalizada · Avenger Sport Gym</div>
+    <h2 class="section-title reveal delay-1 visible" style="margin-top:16px">La IA que convierte preguntas en inscripciones</h2>
+    <p class="section-subtitle reveal delay-2 visible" style="margin:12px auto 0">Cada conversación con un siguiente paso claro: no se queda en "te mando info". Selecciona un escenario para ver cómo respondería tu Agente IA a quien pregunta por mensualidad, a quien dejaste en visto, o a quien tiene dudas de horarios y clases.</p>
+  </div>
+  <div class="sim-container">
+    <div class="sim-scenarios reveal delay-3 visible">
+      <button class="sim-scenario-btn active" onclick="loadScenario(0)">1. Primera vez (Mensualidad)</button>
+      <button class="sim-scenario-btn" onclick="loadScenario(1)">2. Seguimiento (cliente en visto)</button>
+      <button class="sim-scenario-btn" onclick="loadScenario(2)">3. Dudas de horarios y clases</button>
+    </div>
+    <div class="sim-chat reveal-scale delay-4 visible">
+      <div class="sim-chat-header">
+        <div class="sim-av">A</div>
+        <div class="sim-info"><h5>Avenger Sport Gym</h5><span><span class="online-dot"></span> Asistente IA · responde 24/7</span></div>
+      </div>
+      <div class="sim-chat-body" id="simChatBody"></div>
+      <div class="sim-chat-footer">
+        <div class="sim-input">Selecciona un escenario para iniciar...</div>
+        <div class="sim-send"><i class="fa-solid fa-paper-plane" style="color:white;"></i></div>
+      </div>
+    </div>
+    <p class="foot-note">Esta es una <strong>vista previa funcional</strong>. El Agente IA se conecta a tu Instagram, WhatsApp y Messenger, y aprende de tus horarios, precios y reglas reales del gym.</p>
+  </div>
+</div></section>
+
+<script>
+const scenarios=[
+  {title:'Primera vez (Mensualidad)',messages:[
+    {type:'user',text:'Hola, vi su gym en Insta. ¿Cuánto sale la mensualidad?',delay:600},
+    {type:'bot',text:'¡Qué onda! 💪 Bienvenido a Avenger Sport Gym. Antes de pasarte el plan, cuéntame rapidito: ¿ya entrenas en otro gym o sería tu primera vez con nosotros?',delay:2600},
+    {type:'user',text:'Es mi primera vez, no he entrenado hace rato.',delay:5400},
+    {type:'bot',text:'¡Perfecto, vamos a hacerlo bien desde el día 1! 🔥 ¿Qué te gustaría lograr? ¿Bajar grasa, ganar músculo, o mantenerte activo y con energía?',delay:7800},
+    {type:'user',text:'Bajar grasa y tonificar la verdad.',delay:11000},
+    {type:'bot',text:'Buenísimo objetivo. Para eso te recomiendo el plan completo (pesas + área funcional + clases). Sale en *$650 al mes* y esta semana **te regalamos la inscripción ($200)** 🎁\n\n¿Qué horario te queda mejor: mañana (6-10am), tarde (4-6pm) o noche (7-10pm)? Así te confirmo cupo.',delay:14000},
+    {type:'user',text:'En la noche, salgo de chamba 7.',delay:18000},
+    {type:'bot',text:'Va, el bloque 7-10pm es el más activo, te va a gustar el ambiente 🔥\n\nTe agendo tu **visita gratis** para que conozcas las instalaciones y entrenes una sesión de prueba sin costo. ¿Te queda mañana a las 8pm? 📍 Av. Hidalgo #234, frente al OXXO grande.',delay:22500}
+  ]},
+  {title:'Seguimiento (cliente en visto)',messages:[
+    {type:'bot',text:'¡Hola Karla! 👋 Hace un par de días me preguntaste por la mensualidad de Avenger y nos quedamos pendientes. No te dejo en visto 😄\n\n¿Sigues buscando dónde entrenar o ya encontraste lugar?',delay:600},
+    {type:'user',text:'Ay sí, perdón. La verdad me dio flojera ir a preguntar jaja',delay:4500},
+    {type:'bot',text:'Total te entiendo 😅 Por eso te lo hago fácil: tenemos **pase de cortesía de 1 día** para que vengas a probar sin compromiso. Solo me dices qué día te late y te apunto.\n\nY si te animas a quedarte, esta semana **la inscripción ($200) sale gratis** 🎁',delay:8000},
+    {type:'user',text:'Va, el sábado en la mañana.',delay:12000},
+    {type:'bot',text:'¡Listo! Te apunto **sábado 9am** 📅\n\nSolo trae:\n• Ropa cómoda\n• Botella de agua\n• Toalla pequeña\n\nMañana viernes te paso recordatorio por aquí y la ubicación exacta. ¿Te queda?',delay:16000},
+    {type:'user',text:'Sí perfecto, ahí nos vemos.',delay:20000},
+    {type:'bot',text:'¡Va Karla, te esperamos con todo! 💪\n\nUn tip: llega 10 min antes para que te demos el tour rápido y entres directo a entrenar. Nos vemos sábado 🔥',delay:23500}
+  ]},
+  {title:'Dudas de horarios y clases',messages:[
+    {type:'user',text:'Hola, ¿a qué hora abren los sábados? Y tienen clases de spinning?',delay:600},
+    {type:'bot',text:'¡Hola! 🚴‍♀️ Sí tenemos.\n\n🕖 **Sábados:** 7am a 3pm\n🚴 **Spinning sábado:** 9am y 11am\n\n¿Vendrías solo o sería para entrenar con alguien más? Pregunto por si te interesa nuestra promo de acompañante.',delay:2800},
+    {type:'user',text:'Solo. ¿Cuánto sale la clase suelta de spinning?',delay:6000},
+    {type:'bot',text:'La clase suelta sale **$80**. Pero te cuento una mejor opción 👇\n\nEsta semana la mensualidad completa ($650) **incluye spinning ilimitado + pesas + funcional + clases**, y la inscripción ($200) sale gratis. O sea con 8 clases de spinning ya recuperas la mensualidad.\n\n¿Te late venir el sábado a probar gratis primero antes de decidir?',delay:9500},
+    {type:'user',text:'Mmm sí, eso me late más. ¿Reservo?',delay:14000},
+    {type:'bot',text:'¡Perfecto! Te apunto para **sábado 9am en spinning** 🚲\n\n• Llega 10 min antes para acomodarte la bici\n• Trae toalla y agua\n• Ropa fresca\n\n¿A qué nombre te apunto?',delay:17500},
+    {type:'user',text:'Diana Robles.',delay:21000},
+    {type:'bot',text:'¡Listo Diana! 📝 Apuntada para sábado 9am, clase de spinning con Coach Beto (es el rifado).\n\nTe mando recordatorio el viernes con la ubicación. Cualquier cosa por aquí estoy. ¡Te esperamos! 🔥',delay:24500}
+  ]}
+];
+let currentScenario=0,simTimeoutIds=[],simScrollTriggered=false;
+const simObserver=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting&&!simScrollTriggered){simScrollTriggered=true;setTimeout(()=>loadScenario(0),400)}})},{threshold:.3});
+const simSection=document.getElementById('simChatBody');if(simSection)simObserver.observe(simSection);
+
+function addBubble(msg,container){
+  const b=document.createElement('div');
+  b.className='sim-bubble '+msg.type;
+  const now=new Date();
+  const text=msg.text
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/\n/g,'<br>');
+  b.innerHTML=text+'<span class="sim-time">'+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+'</span>';
+  container.appendChild(b);
+  container.scrollTop=container.scrollHeight;
+}
+function loadScenario(idx){
+  document.querySelectorAll('.sim-scenario-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  simTimeoutIds.forEach(id=>clearTimeout(id));simTimeoutIds=[];
+  const body=document.getElementById('simChatBody');body.innerHTML='';currentScenario=idx;
+  scenarios[idx].messages.forEach(msg=>{
+    const tid=setTimeout(()=>{
+      if(msg.type==='bot'){
+        const t=document.createElement('div');
+        t.className='sim-typing';
+        t.innerHTML='<span></span><span></span><span></span>';
+        body.appendChild(t);
+        body.scrollTop=body.scrollHeight;
+        setTimeout(()=>{t.remove();addBubble(msg,body)},1200);
+      } else addBubble(msg,body);
+    },msg.delay);
+    simTimeoutIds.push(tid);
+  });
+}
+</script>
+
+</body>
+</html>
