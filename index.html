@@ -45,6 +45,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .sim-scenario-btn{padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;border:2px solid var(--gray-200);color:var(--gray-600);transition:all .3s;background:var(--white)}
 .sim-scenario-btn:hover{border-color:var(--magenta);color:var(--magenta)}
 .sim-scenario-btn.active{background:var(--gradient);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(230,0,126,.3)}
+@keyframes scenarioPulse{0%,100%{box-shadow:0 0 0 0 rgba(230,0,126,0);border-color:var(--gray-200);color:var(--gray-600);transform:scale(1)}50%{box-shadow:0 0 0 8px rgba(230,0,126,.15);border-color:var(--magenta);color:var(--magenta);transform:scale(1.04)}}
+.sim-scenario-btn.pulse:not(.active){animation:scenarioPulse 1.4s ease-in-out infinite}
 .sim-chat{background:var(--gray-50);border-radius:var(--radius-lg);border:1px solid var(--gray-200);overflow:hidden;box-shadow:var(--shadow-md)}
 .sim-chat-header{background:var(--gradient);padding:16px 20px;display:flex;align-items:center;gap:12px}
 .sim-chat-header .sim-av{width:44px;height:44px;border-radius:50%;background:#0f0f0f;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;border:2px solid rgba(255,255,255,.4);letter-spacing:-1px}
@@ -130,7 +132,7 @@ const scenarios=[
     {type:'bot',text:'¡Listo Diana! 📝 Apuntada para sábado 9am, clase de spinning con Coach Beto (es el rifado).\n\nTe mando recordatorio el viernes con la ubicación. Cualquier cosa por aquí estoy. ¡Te esperamos! 🔥',delay:24500}
   ]}
 ];
-let currentScenario=0,simTimeoutIds=[],simScrollTriggered=false;
+let currentScenario=0,simTimeoutIds=[],simScrollTriggered=false,lastScenarioVisited=false;
 const simObserver=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting&&!simScrollTriggered){simScrollTriggered=true;setTimeout(()=>loadScenario(0),400)}})},{threshold:.3});
 const simSection=document.getElementById('simChatBody');if(simSection)simObserver.observe(simSection);
 
@@ -147,10 +149,15 @@ function addBubble(msg,container){
   container.scrollTop=container.scrollHeight;
 }
 function loadScenario(idx){
-  document.querySelectorAll('.sim-scenario-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const btns=document.querySelectorAll('.sim-scenario-btn');
+  btns.forEach((b,i)=>{b.classList.toggle('active',i===idx);b.classList.remove('pulse');});
+  if(idx===scenarios.length-1)lastScenarioVisited=true;
   simTimeoutIds.forEach(id=>clearTimeout(id));simTimeoutIds=[];
   const body=document.getElementById('simChatBody');body.innerHTML='';currentScenario=idx;
+  let lastEnd=0;
   scenarios[idx].messages.forEach(msg=>{
+    const end=msg.delay+(msg.type==='bot'?1200:0);
+    if(end>lastEnd)lastEnd=end;
     const tid=setTimeout(()=>{
       if(msg.type==='bot'){
         const t=document.createElement('div');
@@ -163,6 +170,15 @@ function loadScenario(idx){
     },msg.delay);
     simTimeoutIds.push(tid);
   });
+  if(idx<scenarios.length-1){
+    const nextTid=setTimeout(()=>{
+      if(!lastScenarioVisited&&currentScenario===idx){
+        const nextBtn=document.querySelectorAll('.sim-scenario-btn')[idx+1];
+        if(nextBtn&&!nextBtn.classList.contains('active'))nextBtn.classList.add('pulse');
+      }
+    },lastEnd+2500);
+    simTimeoutIds.push(nextTid);
+  }
 }
 </script>
 
